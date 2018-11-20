@@ -57,6 +57,7 @@ class BP_bbP_ST_Admin {
 		}
 
 		// forums metabox
+		add_action('add_meta_boxes', 'forum_meta_box_register', 10, 1); //For bbPress 2.6
 		add_action( 'bbp_forum_attributes_metabox',             array( $this, 'forum_meta_box_register' ),      10    );
 		add_action( 'bbp_forum_attributes_metabox_save',        array( $this, 'forum_meta_box_save' ),          10, 1 );
 
@@ -108,88 +109,6 @@ class BP_bbP_ST_Admin {
 			<p><?php printf( esc_html__( 'Version %s of Buddy-bbPress Support Topic requires version %s of bbPress to be activated. Please upgrade bbPress.', 'buddy-bbpress-support-topic' ), bpbbpst_get_plugin_version(), bpbbpst_bbp_required_version() ); ?></p>
 		</div>
 		<?php
-	}
-
-	/**
-	 * Registers a new metabox in Forum's edit form (admin)
-	 *
-	 * @since 2.0
-	 *
-	 * @global $post_ID
-	 * @uses   bbp_is_forum_category() to check if the forum is a category
-	 * @uses   add_meta_box() to add the metabox to forum edit screen
-	 * @uses   bbp_get_forum_post_type() to get forum post type
-	 */
-	public function forum_meta_box_register() {
-		global $post_ID;
-
-		if ( bbp_is_forum_category( $post_ID ) ) {
-			return;
-		}
-
-		add_meta_box (
-			'bpbbpst_forum_settings',
-			__( 'Support settings', 'buddy-bbpress-support-topic' ),
-			array( &$this, 'forum_meta_box_display' ),
-			bbp_get_forum_post_type(),
-			'normal',
-			'low'
-		);
-
-	}
-
-	/**
-	 * Displays the content for the metabox
-	 *
-	 * @since 2.0
-	 *
-	 * @param object $forum the forum object
-	 * @uses  bpbbpst_get_forum_support_setting() to get forum support setting
-	 * @uses  bpbbpst_display_forum_setting_options() to list the available support settings
-	 * @uses  bpbbpst_checklist_moderators() to list the bbPress keymasters and moderators
-	 * @uses  do_action_ref_array() call 'bpbbpst_forum_support_options' to add your custom forum support settings
-	 */
-	public function forum_meta_box_display( $forum = false ) {
-		if ( empty( $forum->ID ) ) {
-			return;
-		}
-
-		$support_feature = bpbbpst_get_forum_support_setting( $forum->ID );
-
-		$mailing_list_style = '';
-		if ( 3 === (int) $support_feature ) {
-			$mailing_list_style = 'style="display:none"';
-		}
-
-		$support_only_style = 'style="display:none"';
-
-		if ( 2 === (int) $support_feature ) {
-			$support_only_style = '';
-		}
-
-		bpbbpst_display_forum_setting_options( $support_feature );
-		?>
-		<div class="bpbbpst-mailing-list" <?php echo $mailing_list_style;?>>
-			<h4><?php _e( 'Who should receive an email notification when a new support topic is posted ?', 'buddy-bbpress-support-topic' );?></h4>
-
-			<?php bpbbpst_checklist_moderators( $forum->ID );?>
-		</div>
-
-		<?php do_action_ref_array( 'bpbbpst_forum_support_options', array( $forum->ID, $mailing_list_style ) ); ?>
-
-		<div class="bpbbpst-support-guides" <?php echo $support_only_style;?>>
-			<h4><?php _e( 'New Topic form extras', 'buddy-bbpress-support-topic' );?></h4>
-			<label class="screen-reader-text" for="support-topic-intro"><?php esc_html_e( 'New Topic Guide', 'buddy-bbpress-support-topic' ); ?></label>
-			<textarea rows="3" cols="40" name="_bpbbpst_support_topic[intro]" id="support-topic-intro" style="width:100%"><?php echo bpbbpst_get_forum_support_topic_intro( $forum->ID );?></textarea>
-			<p class="description"><?php printf( esc_html__( 'Use this field to insert some instructions above the new topic form. Allowed tags are: %s', 'buddy-bbpress-support-topic' ), join( ', ', array_keys( (array) wp_kses_allowed_html( 'forum' ) ) ) ); ?></p>
-
-			<label class="screen-reader-text" for="support-topic-tpl"><?php esc_html_e( 'New Topic Template', 'buddy-bbpress-support-topic' ); ?></label>
-			<textarea rows="3" cols="40" name="_bpbbpst_support_topic[tpl]" id="support-topic-tpl" style="width:100%"><?php echo bpbbpst_get_forum_support_topic_template( $forum->ID );?></textarea>
-			<p class="description"><?php esc_html_e( 'The text added within this field will be used as a template for the content of new topics.', 'buddy-bbpress-support-topic' ); ?></p>
-		</div>
-		<?php
-
-		do_action_ref_array( 'bpbbpst_forum_support_options_after_guides', array( $forum->ID, $support_only_style ) );
 	}
 
 	/**
