@@ -883,6 +883,49 @@ function bpbbpst_get_selectbox( $support_status = 1, $topic_id = 0 ) {
 	return apply_filters( 'bpbbpst_get_selectbox', $output, $support_status, $topic_id );
 
 }
+/* temporary solution to display metabox from bbpress 2.6 */
+function bbpbbpst_get_selectbox( $support_status = 1, $topic_id = 0 ) {
+
+	if ( empty( $topic_id ) ) {
+		return;
+	}
+
+	$all_status = bpbbpst_get_support_status();
+
+	if ( empty( $all_status ) || ! is_array( $all_status ) ) {
+		return;
+	}
+
+	$output = '<span class="support-select-box">';
+	$output .= '<select class="support-select-status" name="_support_status" data-topicsupport=">';
+
+	if ( $topic_id == 'adminlist' ) {
+		$output .= '<option value="-1">' . __( 'All support status', 'buddy-bbpress-support-topic' ) .'</option>';
+	}
+
+	foreach ( $all_status as $status ) {
+
+		if ( $topic_id == 'adminlist' && $status['value'] == 0 ) {
+			continue;
+		}
+
+		$output .= '<option value="'. $status['value'] .'" ';
+		$output .= selected( $support_status, $status['value'], false );
+		$output .= '>'. $status['sb-caption'] .'</option>';
+	}
+
+	$output .= '</select>';
+
+	// nonce field
+	if ( $topic_id != 'adminlist' ) {
+		$output .= wp_nonce_field( 'bpbbpst_support_status', '_wpnonce_bpbbpst_support_status', true, false );
+	}
+
+	$output .= '</span>';
+
+	return apply_filters( 'bpbbpst_get_selectbox', $output, $support_status, $topic_id );
+
+}
 
 /**
  * Eventually unsets the not a support questions for support only forums
