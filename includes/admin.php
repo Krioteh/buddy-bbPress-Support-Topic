@@ -289,7 +289,7 @@ class BP_bbP_ST_Admin {
 		<p>
 			<strong class="label"><?php _e( 'Support:', 'buddy-bbpress-support-topic' ); ?></strong>
 			<label class="screen-reader-text" for="parent_id"><?php _e( 'Support', 'buddy-bbpress-support-topic' ); ?></label>
-			<?php echo bpbbpst_get_selectbox( $support_status, $topic_id);?>
+			<?php echo bpbbpst_get_selectbox_admin( $support_status, $topic_id);?>
 		</p>
 		<?php
 	}
